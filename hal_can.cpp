@@ -13,31 +13,8 @@
 namespace RODOS
 {
     /*****************************************************************************
-     * Structs / Enums
-     ****************************************************************************/
-    struct CAN_Filter
-    {
-        uint32_t canID;
-        uint32_t canIDmask;
-        bool isExtID;
-        bool rtr;
-        HAL_CAN *owner;
-        HW_HAL_CAN *owner_context;
-    };
-
-    /*****************************************************************************
-     * Private - Global variables
-     ****************************************************************************/
-    CAN_Ctrl CAN_Ctrl::CANs[2] = {CAN_Ctrl(CAN1), CAN_Ctrl(CAN2)};
-    static bool CanGlobalInit = false;
-
-    /*****************************************************************************
-     * Private - Function prototypes
-     ****************************************************************************/
-    static void CANGlobalInit();
-
-    /*****************************************************************************
-     * Private - Function implementation
+     * Function - CANGlobalInit
+     * @brief Enables CAN clock for CAN1 and CAN2 if not already running
      ****************************************************************************/
     static void CANGlobalInit()
     {
@@ -49,13 +26,8 @@ namespace RODOS
     }
 
     /*****************************************************************************
-     * Public - Class implementation
+     * Class CAN_Ctrl - Constructor
      ****************************************************************************/
-
-    /*****************************************************************************
-     * Member Function implementation
-     ****************************************************************************/
-
     CAN_Ctrl::CAN_Ctrl(CAN_TypeDef *_can)
     {
         initialized = false;

@@ -54,11 +54,22 @@
 /**************************************************************************************************
  * Public - typedef structs
  *************************************************************************************************/
+struct CAN_Filter
+{
+    uint32_t canID;
+    uint32_t canIDmask;
+    bool isExtID;
+    bool rtr;
+    HAL_CAN *owner;
+    HW_HAL_CAN *owner_context;
+};
 
 /**************************************************************************************************
  * Public - Shared variable
  *************************************************************************************************/
 extern unsigned long rodosErrorCounter;
+CAN_Ctrl CAN_Ctrl::CANs[2] = {CAN_Ctrl(CAN1), CAN_Ctrl(CAN2)};
+static bool CanGlobalInit = false;
 
 extern "C"
 {
@@ -109,12 +120,28 @@ extern "C"
 /**************************************************************************************************
  * Public - class prototype
  *************************************************************************************************/
+class HAL_CAN;
 class HW_HAL_CAN;
 class CAN_Ctrl;
 
 /**************************************************************************************************
  * Public - function prototype
  *************************************************************************************************/
+static void CANGlobalInit();
+
+class HW_HAL_CAN
+{
+private:
+    friend class HAL_CAN;
+    friend class CAN_Ctrl;
+
+    CAN_Ctrl *ctrl;
+    Fifo<CanRxMsg, 64> RxFifo;
+    volatile bool rxFifoEmpty;
+
+    HW_HAL_CAN();
+};
+
 class CAN_Ctrl
 {
 private:
@@ -143,19 +170,6 @@ public:
     void SceIRQHandler();
 
     static CAN_Ctrl CANs[2];
-};
-
-class HW_HAL_CAN
-{
-private:
-    friend class HAL_CAN;
-    friend class CAN_Ctrl;
-
-    CAN_Ctrl *ctrl;
-    Fifo<CanRxMsg, 64> RxFifo;
-    volatile bool rxFifoEmpty;
-
-    HW_HAL_CAN();
 };
 
 /*End of File                                                                                    */
