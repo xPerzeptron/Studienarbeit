@@ -29,6 +29,7 @@ namespace RODOS
      * Private - Global variables
      ****************************************************************************/
     CAN_Ctrl CAN_Ctrl::CANs[2] = {CAN_Ctrl(CAN1), CAN_Ctrl(CAN2)};
+    static bool CanGlobalInit = false;
 
     /*****************************************************************************
      * Private - Function prototypes
@@ -40,10 +41,9 @@ namespace RODOS
      ****************************************************************************/
     static void CANGlobalInit()
     {
-        static bool init = false;
-        if (!init)
+        if (!CanGlobalInit)
         {
-            init = true;
+            CanGlobalInit = true;
             RCC_APB1PeriphClockCmd((RCC_APB1Periph_CAN1 | RCC_APB1Periph_CAN2), ENABLE);
         }
     }
