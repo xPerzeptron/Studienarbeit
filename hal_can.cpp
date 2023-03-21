@@ -50,53 +50,11 @@ namespace RODOS
     }
 
     /*****************************************************************************
-     * Public - Classes
+     * Public - Class implementation
      ****************************************************************************/
-    class CAN_Ctrl
-    {
-    private:
-        friend class HAL_CAN;
-        friend class HW_HAL_CAN;
-
-        bool initialized;
-        CAN_TypeDef *can;
-        GPIO_PIN rxPin;
-        GPIO_PIN txPin;
-        CAN_Filter filters[MAX_FILTERS];
-        int numFilters;
-        CAN_Filter *hwFilterOrder[MAX_FILTERS + 5]; //+5 because smaller filters may require padding in hw registers
-        Fifo<CanTxMsg, 16> txFifo;
-        volatile bool txFifoEmpty;
-        Semaphore CANCtrlProtector;
-
-        CAN_Ctrl(CAN_TypeDef *_can);
-        void init(uint32_t baudrate);
-        bool putIntoTxMailbox(CanTxMsg &msg);
-        bool setupFilters();
-
-    public:
-        void TxIRQHandler();
-        void RxIRQHandler();
-        void SceIRQHandler();
-
-        static CAN_Ctrl CANs[2];
-    };
-
-    class HW_HAL_CAN
-    {
-    private:
-        friend class HAL_CAN;
-        friend class CAN_Ctrl;
-
-        CAN_Ctrl *ctrl;
-        Fifo<CanRxMsg, 64> RxFifo;
-        volatile bool rxFifoEmpty;
-
-        HW_HAL_CAN();
-    };
 
     /*****************************************************************************
-     * Member functions
+     * Member Function implementation
      ****************************************************************************/
 
     CAN_Ctrl::CAN_Ctrl(CAN_TypeDef *_can)

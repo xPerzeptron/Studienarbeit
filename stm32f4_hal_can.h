@@ -112,25 +112,48 @@ class HW_HAL_CAN;
 /**************************************************************************************************
  * Public - function prototype
  *************************************************************************************************/
+class CAN_Ctrl
+{
+private:
+    friend class HAL_CAN;
+    friend class HW_HAL_CAN;
 
-CAN_Ctrl::CAN_Ctrl(CAN_TypeDef *_can);
-void CAN_Ctrl::init(uint32_t baudrate);
-bool CAN_Ctrl::putIntoTxMailbox(CanTxMsg &msg);
-bool CAN_Ctrl::setupFilters();
-void CAN_Ctrl::TxIRQHandler();
-void CAN_Ctrl::RxIRQHandler();
-void CAN_Ctrl::SceIRQHandler();
-HW_HAL_CAN::HW_HAL_CAN();
-HAL_CAN::HAL_CAN(CAN_IDX canIdx, GPIO_PIN rxPin, GPIO_PIN txPin);
-int32_t HAL_CAN::init(uint32_t baudrate);
-void HAL_CAN::reset();
-int32_t HAL_CAN::config(CAN_PARAMETER_TYPE type, uint32_t paramVal);
-CanErrorMsg HAL_CAN::status(CAN_STATUS_TYPE type);
-bool HAL_CAN::isWriteFinished();
-bool HAL_CAN::isDataReady();
-bool HAL_CAN::addIncomingFilter(uint32_t ID, uint32_t IDMask, bool extID, bool rtr);
-int8_t HAL_CAN::write(const uint8_t *sendBuf, uint8_t len, uint32_t canID, bool extID, bool rtr);
-int8_t HAL_CAN::read(uint8_t *recBuf, uint32_t *canID, bool *isExtID, bool *rtr);
+    bool initialized;
+    CAN_TypeDef *can;
+    GPIO_PIN rxPin;
+    GPIO_PIN txPin;
+    CAN_Filter filters[MAX_FILTERS];
+    int numFilters;
+    CAN_Filter *hwFilterOrder[MAX_FILTERS + 5]; //+5 because smaller filters may require padding in hw registers
+    Fifo<CanTxMsg, 16> txFifo;
+    volatile bool txFifoEmpty;
+    Semaphore CANCtrlProtector;
+
+    CAN_Ctrl(CAN_TypeDef *_can);
+    void init(uint32_t baudrate);
+    bool putIntoTxMailbox(CanTxMsg &msg);
+    bool setupFilters();
+
+public:
+    void TxIRQHandler();
+    void RxIRQHandler();
+    void SceIRQHandler();
+
+    static CAN_Ctrl CANs[2];
+};
+
+class HW_HAL_CAN
+{
+private:
+    friend class HAL_CAN;
+    friend class CAN_Ctrl;
+
+    CAN_Ctrl *ctrl;
+    Fifo<CanRxMsg, 64> RxFifo;
+    volatile bool rxFifoEmpty;
+
+    HW_HAL_CAN();
+};
 
 /*End of File                                                                                    */
 #endif /* STM32F_HAL_CAN_H_ */
