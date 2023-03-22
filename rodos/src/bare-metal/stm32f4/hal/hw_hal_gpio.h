@@ -3,7 +3,7 @@
 
 #include "hal/hal_gpio.h"
 
-#include "stm32f4xx_gpio.h"
+#include "STM32F4xx_StdPeriph_Driver/inc/stm32f4xx_gpio.h"
 
 #ifndef NO_RODOS_NAMESPACE
 namespace RODOS {

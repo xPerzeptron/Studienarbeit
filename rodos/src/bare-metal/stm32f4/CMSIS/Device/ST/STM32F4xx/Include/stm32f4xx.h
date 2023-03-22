@@ -469,7 +469,7 @@ typedef enum IRQn
 #define     __IO    volatile             /*!< Defines 'read / write' permissions              */
 
 #else
-#include "core_cm4.h"             /* Cortex-M4 processor and core peripherals */
+#include "CMSIS/Include/core_cm4.h"             /* Cortex-M4 processor and core peripherals */
 #include "system_stm32f4xx.h"
 #endif
 #include <stdint.h>

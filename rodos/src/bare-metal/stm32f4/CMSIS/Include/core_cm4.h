@@ -166,9 +166,9 @@
 #endif
 
 #include <stdint.h>                      /* standard types definitions                      */
-#include <core_cmInstr.h>                /* Core Instruction Access                         */
-#include <core_cmFunc.h>                 /* Core Function Access                            */
-#include <core_cm4_simd.h>               /* Compiler specific SIMD Intrinsics               */
+#include <CMSIS/Include/core_cmInstr.h>  /* Core Instruction Access                         */
+#include <CMSIS/Include/core_cmFunc.h>   /* Core Function Access                            */
+#include <CMSIS/Include/core_cm4_simd.h> /* Compiler specific SIMD Intrinsics               */
 
 #endif /* __CORE_CM4_H_GENERIC */
 
