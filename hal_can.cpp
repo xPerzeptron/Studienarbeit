@@ -12,10 +12,10 @@
 
 namespace RODOS
 {
-    /*****************************************************************************
+    /**
      * Function - CANGlobalInit
      * @brief Enables CAN clock for CAN1 and CAN2 if not already running
-     ****************************************************************************/
+     */
     static void CANGlobalInit()
     {
         if (!CanGlobalInit)
@@ -25,9 +25,11 @@ namespace RODOS
         }
     }
 
-    /*****************************************************************************
-     * Class CAN_Ctrl - Constructor
-     ****************************************************************************/
+    /**
+     * @brief Constructor for class CAN_Ctrl
+     *
+     * @param _can
+     */
     CAN_Ctrl::CAN_Ctrl(CAN_TypeDef *_can)
     {
         initialized = false;
@@ -38,6 +40,11 @@ namespace RODOS
         // txPin=GPIO_000;
     }
 
+    /**
+     * @brief Initialize the CAN Controller with the respective baudrate
+     *
+     * @param baudrate
+     */
     void CAN_Ctrl::init(uint32_t baudrate)
     {
         if (!initialized)
@@ -127,11 +134,24 @@ namespace RODOS
         }
     }
 
+    /**
+     * @brief Add a new telegram to the TxMailbox (transmit)
+     *
+     * @param msg CAN message
+     * @return true if message was transmitted successfully
+     * @return false if message was not transmitted or there was no available mailbox
+     */
     bool CAN_Ctrl::putIntoTxMailbox(CanTxMsg &msg)
     {
         return CAN_Transmit(can, &msg) != CAN_TxStatus_NoMailBox;
     }
 
+    /**
+     * @brief Set CAN filters
+     *
+     * @return true if filters were set successfully
+     * @return false otherwise
+     */
     bool CAN_Ctrl::setupFilters()
     {
         uint8_t bank = 0;
@@ -372,6 +392,10 @@ namespace RODOS
         return true;
     }
 
+    /**
+     * @brief TODO
+     *
+     */
     void CAN_Ctrl::TxIRQHandler()
     {
         bool sending = true;
@@ -405,6 +429,11 @@ namespace RODOS
         CAN_ClearITPendingBit(can, CAN_IT_TME);
     }
 
+    /**
+     * @brief Interrupt Request Handler for incoming CAN messages.
+     * Store received messages in Fifo.
+     *
+     */
     void CAN_Ctrl::RxIRQHandler()
     {
         CanRxMsg msg;
@@ -422,6 +451,10 @@ namespace RODOS
         }
     }
 
+    /**
+     * @brief TODO
+     *
+     */
     void CAN_Ctrl::SceIRQHandler()
     {
         if (CAN_GetFlagStatus(can, CAN_FLAG_BOF) == SET)
@@ -448,14 +481,20 @@ namespace RODOS
     }
 
     /**
-     * @brief Construct a new hw hal can::hw hal can object
-     * This function will do absolutely nothing and exists only for cosmetic reasons
-     * #IHateSergioMontenegro
+     * @brief Constructor for class HW_HAL_CAN
+     *
      */
     HW_HAL_CAN::HW_HAL_CAN()
     {
     }
 
+    /**
+     * @brief Constructor for class HAL_CAN
+     *
+     * @param canIdx
+     * @param rxPin
+     * @param txPin
+     */
     HAL_CAN::HAL_CAN(CAN_IDX canIdx, GPIO_PIN rxPin, GPIO_PIN txPin)
     {
         if (canIdx > CAN_IDX1)
@@ -482,6 +521,12 @@ namespace RODOS
         }
     }
 
+    /**
+     * @brief Initialize HAL_CAN with the respective baudrate
+     *
+     * @param baudrate
+     * @return int32_t
+     */
     int32_t HAL_CAN::init(uint32_t baudrate)
     {
         if (context->ctrl == nullptr)
@@ -503,6 +548,10 @@ namespace RODOS
         return 0;
     }
 
+    /**
+     * @brief TODO
+     *
+     */
     void HAL_CAN::reset()
     {
         if (context->ctrl == 0)
@@ -515,6 +564,13 @@ namespace RODOS
         context->ctrl->CANCtrlProtector.leave();
     }
 
+    /**
+     * @brief TODO
+     *
+     * @param type
+     * @param paramVal
+     * @return int32_t
+     */
     int32_t HAL_CAN::config(CAN_PARAMETER_TYPE type, uint32_t paramVal)
     {
         if (context->ctrl == nullptr)
@@ -533,6 +589,12 @@ namespace RODOS
         return -1;
     }
 
+    /**
+     * @brief TODO
+     *
+     * @param type
+     * @return CanErrorMsg
+     */
     CanErrorMsg HAL_CAN::status(CAN_STATUS_TYPE type)
     {
         CanErrorMsg errorMsg;
@@ -597,6 +659,12 @@ namespace RODOS
         return errorMsg;
     }
 
+    /**
+     * @brief TODO
+     *
+     * @return true
+     * @return false
+     */
     bool HAL_CAN::isWriteFinished()
     {
         if (context->ctrl == 0)
@@ -606,6 +674,12 @@ namespace RODOS
         return context->ctrl->txFifo.isEmpty();
     }
 
+    /**
+     * @brief TODO
+     *
+     * @return true
+     * @return false
+     */
     bool HAL_CAN::isDataReady()
     {
         if (context->ctrl == 0)
@@ -615,6 +689,16 @@ namespace RODOS
         return !context->RxFifo.isEmpty();
     }
 
+    /**
+     * @brief TODO
+     *
+     * @param ID
+     * @param IDMask
+     * @param extID
+     * @param rtr
+     * @return true
+     * @return false
+     */
     bool HAL_CAN::addIncomingFilter(uint32_t ID, uint32_t IDMask, bool extID, bool rtr)
     {
         if (context->ctrl == 0)
@@ -643,6 +727,16 @@ namespace RODOS
         return result;
     }
 
+    /**
+     * @brief TODO
+     *
+     * @param sendBuf
+     * @param len
+     * @param canID
+     * @param extID
+     * @param rtr
+     * @return int8_t
+     */
     int8_t HAL_CAN::write(const uint8_t *sendBuf, uint8_t len, uint32_t canID, bool extID, bool rtr)
     {
         if (context->ctrl == nullptr)
@@ -694,6 +788,15 @@ namespace RODOS
         return 0;
     }
 
+    /**
+     * @brief TODO
+     *
+     * @param recBuf
+     * @param canID
+     * @param isExtID
+     * @param rtr
+     * @return int8_t
+     */
     int8_t HAL_CAN::read(uint8_t *recBuf, uint32_t *canID, bool *isExtID, bool *rtr)
     {
         if (context->ctrl == 0)
